@@ -260,6 +260,14 @@ const LabelTitle = styled.label`
 
 const themeColors = [
 	{
+		name: 'Night',
+		color: '#0B192C',
+		colorSub: '#213555',
+		secondaryColor: '#2E5077',
+		textColor: 'white',
+		labelColor: '#B7B7B7',
+	},
+	{
 		name: 'Morning',
 		color: '#99DBF5',
 		colorSub: '#CDF5FD',
@@ -274,14 +282,6 @@ const themeColors = [
 		secondaryColor: '#DF9755',
 		textColor: '#5C3D2E',
 		labelColor: '#1C0A00',
-	},
-	{
-		name: 'Night',
-		color: '#0B192C',
-		colorSub: '#213555',
-		secondaryColor: '#2E5077',
-		textColor: 'white',
-		labelColor: '#B7B7B7',
 	}
 ]
 

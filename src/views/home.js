@@ -123,7 +123,7 @@ const WeatherImage = styled.img`
 const Label = styled.label`
 	font-size: 1em;
 	font-weight: bolder;
-	padding: 2rem;
+	padding: 2rem 2rem 0 2rem;
 `
 
 const DayForecast = styled.div`

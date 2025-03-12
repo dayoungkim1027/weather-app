@@ -4,6 +4,7 @@ import './App.css';
 import Home from './views/home.js'
 
 const AppContainer = styled.div`
+  display: flex;
   overflow: scroll;
 `;
 

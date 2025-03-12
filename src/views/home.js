@@ -1,5 +1,14 @@
 import styled from 'styled-components';
-import WeatherImg from '../assets/sunny.png';
+import Sunny from '../assets/sun.png';
+import Cloudy from '../assets/cloudy.png';
+import Foggy from '../assets/fog.png';
+import Haze from '../assets/haze.png';
+import Lightening from '../assets/lightening.png';
+import Rainy from '../assets/rainy.png';
+// import Windy from '../assets/windy.png';
+import Snowy from '../assets/snowy.png';
+import Unknown from '../assets/unknown.png';
+
 import './home.css';
 import getLatLonByZip from '../api/getLatLonByZip';
 import getForecast from '../api/getForecast';
@@ -39,7 +48,7 @@ const SearchInput = styled.input`
 const WeatherNowDisplay = styled.div`
 	display: flex;
 	flex-direction: row;
-	margin: 2rem 6rem;
+	margin: 1rem 3rem;
 	justify-content: space-between;
 
 	@media (max-width: 685px) {
@@ -298,7 +307,6 @@ function Home() {
 	};
 
 	const onThemeChange = (data) => {
-		console.log('.data: ', data);
 		setTheme(data);
 	};
 
@@ -310,7 +318,6 @@ function Home() {
 		try {
 			const { lat, lon } = await getLatLonByZip(zipcode ? zipcode : '07647');
 			const data = await getForecast(lat, lon);
-			console.log('data:: ', data);
 			const filtered = data.list.filter((data) => new Date(data.dt_txt).getHours() === 21)
 				.map((data) => ({
 					day: new Date(data.dt_txt).getDay(),
@@ -318,6 +325,7 @@ function Home() {
 					temp: data.main.temp,
 					feels: data.main.feels_like,
 					humidity: data.main.humidity,
+					pressure: data.main.pressure,
 					description: data.weather[0].description,
 					main: data.weather[0].main,
 					wind: data.wind.speed,
@@ -326,6 +334,9 @@ function Home() {
 					time: new Date(`${data.dt_txt} UTC`).toLocaleTimeString("en-US"),
 					temp: data.main.temp,
 					description: data.weather[0].description,
+					humidity: data.main.humidity,
+					pressure: data.main.pressure,
+					main: data.weather[0].main,
 					feels: data.main.feels_like,
 					wind: data.wind.speed,
 			}));
@@ -364,21 +375,41 @@ function Home() {
 						<CityInfo>
 							<CityName style={{ 'color': theme.textColor }}>{cityInfo.name}</CityName>
 							<ChanceRain style={{ 'color': theme.labelColor }}>Change of rain: 0%</ChanceRain>
-							<Temperature style={{ 'color': theme.textColor }}>{Math.round((nowWeather.temp-273.15)*1.8+32)}</Temperature>
+							<Temperature style={{ 'color': theme.textColor }}>{Math.round((nowWeather.temp-273.15)*1.8+32)}°</Temperature>
 						</CityInfo>
 						<WeatherIcon style={{ 'width': '200px', 'height': '200px' }}>
-							<WeatherImage className="rotate" src={WeatherImg}></WeatherImage>
+							<WeatherImage src={
+								nowWeather.main === ('Rain') ? Rainy :
+								nowWeather.main === 'Thunderstorm' ? Lightening :
+								nowWeather.main === 'Snow' ? Snowy :
+								nowWeather.main === ('Clouds') ? Cloudy :
+								nowWeather.main === ('Clear') ? Sunny :
+								nowWeather.main === ('Drizzle') ? Rainy :
+								nowWeather.main === ('Haze') ? Haze :
+								nowWeather.main === ('Fog') ? Foggy :
+								Unknown}>
+							</WeatherImage>
 						</WeatherIcon>
 						
 					</WeatherNowDisplay>
 					<ForecastContainer style={{ 'backgroundColor': theme.colorSub }}>
 						<Label style={{ 'color': theme.labelColor }}>TODAY'S FORECAST</Label>
 						<TodayContainer>
-							{todayWeather.map((hourInfo) => (
-								<EachHourBlock style={{ 'borderRight': `1px solid ${theme.secondaryColor}`}}>
+							{todayWeather.map((hourInfo, index) => (
+								<EachHourBlock key={index} style={{ 'borderRight': `1px solid ${theme.secondaryColor}`}}>
 									<Time style={{ 'color': theme.labelColor }}>{hourInfo.time.replace(':00:00', ':00')}</Time>
-									<WeatherToday src={WeatherImg} />
-									<HourTemperature style={{ 'color': theme.textColor }}>{Math.round((hourInfo.temp-273.15)*1.8+32)}</HourTemperature>
+									<WeatherToday src={
+										hourInfo.main === ('Rain') ? Rainy :
+										hourInfo.main === 'Thunderstorm' ? Lightening :
+										hourInfo.main === 'Snow' ? Snowy :
+										hourInfo.main === ('Clouds') ? Cloudy :
+										hourInfo.main === ('Clear') ? Sunny :
+										hourInfo.main === ('Drizzle') ? Rainy :
+										hourInfo.main === ('Haze') ? Haze :
+										hourInfo.main === ('Fog') ? Foggy :
+										Unknown}>
+									</WeatherToday>
+									<HourTemperature style={{ 'color': theme.textColor }}>{Math.round((hourInfo.temp-273.15)*1.8+32)}°</HourTemperature>
 								</EachHourBlock>
 							))}
 						</TodayContainer>
@@ -389,21 +420,21 @@ function Home() {
 						<AirPanel>
 							<AirConBlock>
 								<AirLabel style={{ 'color': theme.labelColor }}>Feels Like</AirLabel>
-								<AirValue style={{ 'color': theme.textColor }}>{nowWeather.feels}</AirValue>
+								<AirValue style={{ 'color': theme.textColor }}>{Math.round((nowWeather.feels-273.15)*1.8+32)}°</AirValue>
 							</AirConBlock>
 							<AirConBlock>
 								<AirLabel style={{ 'color': theme.labelColor }}>Wind</AirLabel>
-								<AirValue style={{ 'color': theme.textColor }}>{nowWeather.wind}</AirValue>
+								<AirValue style={{ 'color': theme.textColor }}>{nowWeather.wind}m/s</AirValue>
 							</AirConBlock>
 						</AirPanel>
 						<AirPanel>
 							<AirConBlock>
-								<AirLabel style={{ 'color': theme.labelColor }}>Chance of Rain</AirLabel>
-								<AirValue style={{ 'color': theme.textColor }}>#%</AirValue>
+								<AirLabel style={{ 'color': theme.labelColor }}>Humidity</AirLabel>
+								<AirValue style={{ 'color': theme.textColor }}>{nowWeather.humidity}%</AirValue>
 							</AirConBlock>
 							<AirConBlock>
-								<AirLabel style={{ 'color': theme.labelColor }}>UV Index</AirLabel>
-								<AirValue style={{ 'color': theme.textColor }}>#</AirValue>
+								<AirLabel style={{ 'color': theme.labelColor }}>Pressure</AirLabel>
+								<AirValue style={{ 'color': theme.textColor }}>{nowWeather.pressure} hPa</AirValue>
 							</AirConBlock>
 						</AirPanel>
 					</AirQualities>
@@ -414,19 +445,29 @@ function Home() {
 					{weatherData.map((weather, index) => (
 						<DayForecast key={index} style={{ 'borderBottom': `1px solid ${theme.secondaryColor}`}}>
 							<Day style={{ 'color': theme.labelColor }}>{getDayOfWeek(weather.day) === getDayOfWeek(todayIndex) ? 'Today' : getDayOfWeek(weather.day)}</Day>
-							<Weather src={WeatherImg}/>
+							<Weather src={
+								weather.main === ('Rain') ? Rainy :
+								weather.main === 'Thunderstorm' ? Lightening :
+								weather.main === 'Snow' ? Snowy :
+								weather.main === ('Clouds') ? Cloudy :
+								weather.main === ('Clear') ? Sunny :
+								weather.main === ('Drizzle') ? Rainy :
+								weather.main === ('Haze') ? Haze :
+								weather.main === ('Fog') ? Foggy :
+								Unknown}>
+							</Weather>
 							<WeatherLabel style={{ 'color': theme.textColor }}>{weather.main}</WeatherLabel>
-							<Temp style={{ 'color': theme.textColor }}>{Math.round((weather.temp-273.15)*1.8+32)}</Temp>
+							<Temp style={{ 'color': theme.textColor }}>{Math.round((weather.temp-273.15)*1.8+32)}°</Temp>
 						</DayForecast>
 					))}
 				</SevenDayForecastContainer>
 			</MainDiv>
 			<Info>
-				<LabelTitle>Powered by: </LabelTitle>
-				<InfoLabel>
-					<InfoLink href="https://openweathermap.org/api" target="_blank" rel="noreferrer"> OpenWeatherMap API, </InfoLink>
-					<InfoLink href="https://vercel.com/" target="_blank" rel="noreferrer"> Vercel </InfoLink> for hosting, and
-					<InfoLink href="https://react.dev/" target="_blank" rel="noreferrer"> React </InfoLink> as frontend framework.
+				<LabelTitle style={{ 'color': theme.labelColor }}>Powered by: </LabelTitle>
+				<InfoLabel style={{ 'color': theme.labelColor }}>
+					<InfoLink style={{ 'color': theme.textColor }} href="https://openweathermap.org/api" target="_blank" rel="noreferrer"> OpenWeatherMap API, </InfoLink>
+					<InfoLink style={{ 'color': theme.textColor }} href="https://vercel.com/" target="_blank" rel="noreferrer"> Vercel </InfoLink> for hosting, and
+					<InfoLink style={{ 'color': theme.textColor }} href="https://react.dev/" target="_blank" rel="noreferrer"> React </InfoLink> as frontend framework.
 					All of these made with ♥ by Dayoung
 				</InfoLabel>
 			</Info>
